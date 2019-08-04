@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.lovelycoding.magicnote.adapter.NotesRecyclerAdapter;
 import com.lovelycoding.magicnote.models.Note;
 import com.lovelycoding.magicnote.persistant.NoteRepository;
@@ -48,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements
         fab.setOnClickListener(this);
         mNoteRepository=new NoteRepository(this);
         initToolbar();
-        mNotes.add(new Note("First note ","aldklhf","Aug 2019"));
+       // mNotes.add(new Note("First note ","aldklhf","Aug 2019"));
 
         Log.d(TAG, "onCreate: thread"+Thread.currentThread().getName());
         initRecyclerView();
@@ -68,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements
                 if (notes != null) {
                     mNotes.addAll(notes);
                 }
+                checkIsEmptyNote(mNotes.size());
                 mNoteRecyclerAdapter.notifyDataSetChanged();
             }
         });
@@ -80,18 +82,22 @@ public class MainActivity extends AppCompatActivity implements
         toolbar.setTitleTextColor(Color.WHITE);
     }
 
-    private void insertFakeNotes()
-    {
-        for(int i=1;i<1000;i++)
+
+
+
+    private void checkIsEmptyNote(int i){
+
+        if(i==0)
         {
-            Note note=new Note();
-            note.setTitle("Title"+i);
-            note.setContent("content #"+i);
-            note.setTimestamp("Aug 2019");
-            mNotes.add(note);
+            mRecyclerView.setVisibility(View.GONE);
+            findViewById(R.id.tv_123).setVisibility(View.VISIBLE);
+        }
+        else {
+            mRecyclerView.setVisibility(View.VISIBLE);
+            findViewById(R.id.tv_123).setVisibility(View.GONE);
+
 
         }
-        mNoteRecyclerAdapter.notifyDataSetChanged();
     }
 
 
@@ -128,9 +134,24 @@ public class MainActivity extends AppCompatActivity implements
 
     private void  deleteNote(Note note)
     {
-        mNotes.remove(note);
         mNoteRecyclerAdapter.notifyDataSetChanged();
         mNoteRepository.deleteNote(note);
+        mNotes.remove(note);
+
+        // Snackbar.make(getCurrentFocus(),)
+
+        Snackbar snackbar= Snackbar.make(toolbar,"Deleted Successfully ",Snackbar.LENGTH_LONG);
+        snackbar.setAction("Undo", new View.OnClickListener() {
+            @Override
+            public void onClick(View view)
+            {
+                mNoteRepository.insertNoteTask(note);
+                mNotes.add(note);
+            }
+        }
+        ).show();
+       // snackbar.addCallback(Snackbar.DI)
+
     }
     private ItemTouchHelper.SimpleCallback itemTouchHelperCallback=new ItemTouchHelper.SimpleCallback(0,ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT) {
         @Override

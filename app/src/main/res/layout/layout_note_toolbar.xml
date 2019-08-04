@@ -68,6 +68,7 @@
         android:layout_marginStart="15dp"
         android:layout_weight="85"
         android:padding="5dp"
+        android:imeOptions="flagNoExtractUi"
         tools:text="this is edit title"
         android:textColor="@android:color/white"
         android:textSize="18sp"

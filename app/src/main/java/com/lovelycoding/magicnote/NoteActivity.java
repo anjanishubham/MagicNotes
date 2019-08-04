@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.lovelycoding.magicnote.models.Note;
 import com.lovelycoding.magicnote.persistant.NoteRepository;
 import com.lovelycoding.magicnote.util.Utility;
@@ -64,7 +65,7 @@ public class NoteActivity extends AppCompatActivity implements
             enableEditMode();
         } else {
             setNoteProperties();
-            disableEditMode();
+            disableEditMode(1);
             disableContentInteraction();// this for Note content disable while open into detail mode
         }
 
@@ -76,6 +77,8 @@ public class NoteActivity extends AppCompatActivity implements
 
     private void updateNote() {
         mNoteRepository.updateNote(mFinalNote);
+        Snackbar.make(mToolbarNoteEditTitle,"Note updated successfully ",Snackbar.LENGTH_LONG).show();
+
     }
 
     private void saveChanges() {
@@ -90,6 +93,7 @@ public class NoteActivity extends AppCompatActivity implements
     private void saveNewNote() {
 
         mNoteRepository.insertNoteTask(mFinalNote);
+        Snackbar.make(mToolbarNoteEditTitle,"Note added successfully ",Snackbar.LENGTH_LONG).show();
     }
     private void hideSoftKeyboard() {
         InputMethodManager im=(InputMethodManager)this.getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -117,7 +121,7 @@ public class NoteActivity extends AppCompatActivity implements
     }
 
     // disable mode Note detail page
-    private void disableEditMode() {
+    private void disableEditMode(int i) {
         mCheckBoxContainer.setVisibility(View.GONE);
         mBackButtonContainer.setVisibility(View.VISIBLE);
         mToolbarNoteEditTitle.setVisibility(View.GONE);
@@ -138,7 +142,8 @@ public class NoteActivity extends AppCompatActivity implements
             if(!mFinalNote.getContent().equals(mInitialNote.getContent())||
             !mFinalNote.getTitle().equals(mInitialNote.getTitle()))
             {
-                saveChanges();
+                if(i==1)
+                    saveChanges();
                 Log.d(TAG, "disableEditMode:  save changing method ");
 
             }
@@ -280,7 +285,8 @@ public class NoteActivity extends AppCompatActivity implements
         switch (view.getId()) {
             case R.id.toolbar_check: {
                 hideSoftKeyboard();
-                disableEditMode();
+                disableEditMode(0);
+
 
                 break;
             }
@@ -289,6 +295,8 @@ public class NoteActivity extends AppCompatActivity implements
                 break;
             }
             case R.id.toolbar_back_arrow: {
+                disableEditMode(1);
+
                 finish();
             }
         }
@@ -298,7 +306,7 @@ public class NoteActivity extends AppCompatActivity implements
     @Override
     public void onBackPressed() {
         if (mMode == EDIT_MODE_ENABLE) {
-            onClick(mCheckButton);
+            onClick(mBackButton);
         } else
             super.onBackPressed();
     }
